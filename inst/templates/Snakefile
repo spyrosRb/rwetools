@@ -1,0 +1,117 @@
+# Define the final output to ensure the pipeline runs in order
+rule all:
+    input:
+        "output/index.html"
+
+# Rule to create the temp directory and an initial log file
+rule initialize_temp:
+    output:
+        touch("temp/temp_initialized.txt")
+    shell:
+        "mkdir -p temp && touch temp/temp_initialized.txt"
+
+# Setup rule
+rule setup:
+    input:
+        "temp/temp_initialized.txt"
+    output:
+        touch("temp/setup_done.txt")
+    script:
+        "analysis/00_setup.R"
+
+# Rule to run Klompas algorithm
+rule klompas_algo:
+    input:
+        "temp/setup_done.txt"
+    output:
+        touch("temp/klompas_algo_done.txt")
+    script:
+        "analysis/01_klompas_algo.R"
+
+# Rule to extract data
+rule extract_data:
+    input:
+        "temp/klompas_algo_done.txt"
+    output:
+        touch("temp/extracted_data_done.txt")
+    script:
+        "analysis/02_extract_data.R"
+
+# Height preprocessing
+rule height_preprocessing:
+    input:
+        "temp/extracted_data_done.txt"
+    output:
+        touch("temp/height_preprocessing_done.txt")
+    script:
+        "analysis/03.height_preprocessing.R"
+
+# BMI preprocessing
+rule bmi_preprocessing:
+    input:
+        "temp/height_preprocessing_done.txt"
+    output:
+        touch("temp/bmi_preprocessing_done.txt")
+    script:
+        "analysis/04.bmi_preprocessing.R"
+
+# Weight preprocessing
+rule weight_preprocessing:
+    input:
+        "temp/bmi_preprocessing_done.txt"
+    output:
+        touch("temp/weight_preprocessing_done.txt")
+    script:
+        "analysis/05.weight_preprocessing.R"
+
+# HbA1c preprocessing
+rule hba1c_preprocessing:
+    input:
+        "temp/weight_preprocessing_done.txt"
+    output:
+        touch("temp/hba1c_preprocessing_done.txt")
+    script:
+        "analysis/06.hba1c_preprocessing.R"
+
+# Semaglutide cohort
+rule semaglutide_cohort:
+    input:
+        "temp/hba1c_preprocessing_done.txt"
+    output:
+        touch("temp/semaglutide_cohort_done.txt")
+    script:
+        "analysis/07_semaglutide_cohort.R"
+
+# Liraglutide cohort
+rule liraglutide_cohort:
+    input:
+        "temp/semaglutide_cohort_done.txt"
+    output:
+        touch("temp/liraglutide_cohort_done.txt")
+    script:
+        "analysis/08_liraglutide_cohort.R"
+
+# Tirzepatide cohort
+rule tirzepatide_cohort:
+    input:
+        "temp/liraglutide_cohort_done.txt"
+    output:
+        touch("temp/tirzepatide_cohort_done.txt")
+    script:
+        "analysis/09_tirzepatide_cohort.R"
+
+# Rule to render the final report
+rule render_report:
+    input:
+        "temp/tirzepatide_cohort_done.txt"
+    output:
+        "output/index.html" 
+    shell:
+        "quarto render analysis/index.qmd --output-dir ../output"
+
+# Rule to clean up all log files at the end of the pipeline
+rule clean_temp:
+    input:
+        "output/index.html"
+    shell:
+        "rm -f temp/*.txt temp/setup_environment.RData"

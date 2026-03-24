@@ -1,0 +1,135 @@
+---
+title: "Meaningful title"
+
+author: 
+    - name: Spyros Roumpanis
+      email: spyros.roumpanis@roche.com
+      affiliations:
+        - name: F.Hoffmann - La Roche Ltd
+          country: Switzerland
+          
+    - name: Anda Gershon
+      email: gershona@gene.com
+      affiliations:
+        - name: Genentech Inc
+          country: United States
+          
+    - name: Winnie Yeung
+      email: winnie.yeung@roche.com
+      affiliations:
+        - name: Roche Products Ltd
+          country: United Kingdom
+
+date: today
+
+format: 
+  html:
+    logo: roche_logo.png
+    theme: 
+      - custom.scss
+    code-fold: true
+    toc: true
+    title-block-banner: true
+    embed-resources: true
+editor: visual
+bibliography: references.bib
+---
+
+# Metadata
+
+::: callout-note
+## Metadata
+
+|                             |     |
+|-----------------------------|-----|
+| **RWE Portal ID:**          |     |
+| **Study Number:**           |     |
+| **Protocol:**               |     |
+| **Study gDrive:**           |     |
+| **Code repository GitLab:** |     |
+:::
+
+# Status
+
+::: callout-important
+## Under Development
+
+This document is currently under development and may contain both minor and major errors -- Do NOT make any major decisions on the basis of the following results without first consulting the main author(s) to discuss potential errors and limitations.
+:::
+
+# Background
+
+# Methods
+
+## Objectives
+
+## Study design
+
+# Data source
+
+This analysis will be conducted on a dataset drawing on linked IQVIA claims and ambulatory electronic medical records data. 
+
+**IQVIA PharMetrics® Plus** is IQVIA’s US-based longitudinal health plan database of adjudicated medical and pharmacy claims, including patient enrollment data for national and sub-national health plans and self-insured employer groups. The database contains 190+ million enrollees since 2006.
+
+The **IQVIA Ambulatory Electronic Medical Records (AEMR)** database is a healthcare resource that provides clinical information from electronic medical records in ambulatory care settings. The database includes data on patient demographics, diagnoses, laboratory results, medication prescriptions, and treatment outcomes, which can be used to understand patient care and disease management in real-world contexts. By linking this clinical information with other data sources like claims data, researchers can analyze healthcare utilization, treatment effectiveness, and patient outcomes. The IQVIA AEMR database is utilized for various research purposes, including epidemiological studies and health economics and outcomes research, supporting efforts to inform clinical practice and improve patient care.
+
+# Cohort Definition
+
+## Inclusion criteria:
+
+Patients were eligible for inclusion if they met all of the following criteria:
+
+-   At least one prescription for semaglutide or tirzepatide between January 1, 2017 and December 31, 2024
+-   Linkage available in both the Pharmetrics Plus claims database and the AEMR
+-   18 years of age or older at the time of their first semaglutide or tirzepatide prescription (index date)
+-   Diagnosis of obesity, defined by ICD-9/ICD-10 codes or BMI ≥27 kg/m² and a diagnosis type 2 diabetes (T2D) at or prior to the index date if they belong to CG cohort
+-   Continuous enrollment for medical and pharmacy benefits for at least 12 months prior to the index date
+-   Continuous enrollment for medical and pharmacy benefits for at least 12 months after the index date
+
+## Exclusion criteria:
+
+Patients were excluded if they met any of the following criteria:
+
+-   Had any diagnosis or record indicating type 1 diabetes (T1D) at any time in the available data
+
+# Attrition tables
+
+```{r}
+#| label: load-packages
+#| echo: false
+#| include: false
+library(dplyr)
+library(tidyr)
+library(here)
+library(glue)
+library(data.table)
+library(kableExtra)
+library(quarto)
+library(arsenal)
+library(table1)
+
+```
+
+```{r}
+#| label: source-functions
+#| echo: false
+#| include: false
+source('/home/roumpans/prior_incretins/R/utils.R')
+```
+
+```{r}
+#| label: load-data-files
+#| echo: false
+#| include: false
+
+```
+
+# Results
+
+## Baseline characteristics
+
+::: {.panel-tabset .nav-pills}
+### Semaglutide CWM
+
+### **Semaglutide** 
+:::

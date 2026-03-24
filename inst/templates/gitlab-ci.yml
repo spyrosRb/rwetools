@@ -1,0 +1,74 @@
+default:
+  tags:
+    # Tag used to select specific runners on Appolo
+    - K8S-RWEG-RR-PROD-USW2
+  id_tokens:
+    # Request for the ID token to authenticate with the Vault
+    VAULT_ID_TOKEN:
+      aud: https://code.roche.com
+
+workflow:
+  rules:
+    # Trigger pipeline on commits to the default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # Trigger pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+run-script:
+  # Base image used for the job
+  image: 537212169289.dkr.ecr.eu-central-1.amazonaws.com/rstudio-standard:R4.3.3-15jul2024
+
+  # Define the stage in the pipeline
+  stage: build
+  
+  variables:
+    # Define environment variables
+    KUBERNETES_CPU_LIMIT: "8"
+
+    # Set the memory limit for Kubernetes
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
+
+    # Define the Vault namespace to be used
+    VAULT_NAMESPACE: rweg
+
+    # URL of the Vault server
+    VAULT_SERVER_URL: https://vault.service.roche.com
+
+    # Use a dynamic role based on the user's GitLab username
+    VAULT_AUTH_ROLE: user-${GITLAB_USER_LOGIN}-role
+
+  # Define secrets to be fetched from Vault
+  # file: false Indicates not to store this secret as a file
+  secrets:
+    # Fetch ROCHE_USERNAME secret from Vault
+    ROCHE_USERNAME:
+      vault: ${GITLAB_USER_LOGIN}/env/ROCHE_USERNAME@secret
+      file: false
+
+    # Fetch ROCHE_PASSWORD secret from Vault
+    ROCHE_PASSWORD:
+      vault: ${GITLAB_USER_LOGIN}/env/ROCHE_PASSWORD@secret
+      file: false
+
+    # Fetch CONNECT_API_KEY secret from Vault
+    CONNECT_API_KEY:
+      vault: ${GITLAB_USER_LOGIN}/env/CONNECT_API_KEY@secret
+      file: false
+
+    # Fetch REDSHIFT_USERNAME secret from Vault
+    REDSHIFT_USERNAME:
+      vault: ${GITLAB_USER_LOGIN}/env/REDSHIFT_USERNAME@secret
+      file: false
+
+    # Fetch REDSHIFT_PASSWORD secret from Vault
+    REDSHIFT_PASSWORD:
+      vault: ${GITLAB_USER_LOGIN}/env/REDSHIFT_PASSWORD@secret
+      file: false
+
+    # Fetch GITLAB_PAT (Personal Access Token) secret from Vault
+    GITLAB_PAT:
+      vault: ${GITLAB_USER_LOGIN}/env/GITLAB_PAT@secret
+      file: false
+
+  script:
+    - snakemake --cores 8

@@ -1,0 +1,13 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+.quarto-title-banner {
+    background-color: #0B41CD;
+    background-image: url(roche_logo.png);
+    background-size: 60px auto;
+    background-position: 10px 10px; // x y position of the logo
+    padding-left: 60px; // adjust to give more space for the logo
+    padding-top: 10px;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+}
