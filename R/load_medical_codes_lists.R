@@ -107,11 +107,7 @@ load_medical_code_lists <- function(path,
     # --- Group codes by vocabulary ---
     code_list <- split(data$code, data$vocabulary)
 
-    # --- Format codes for SQL IN clauses ---
-    db_con <- con
-    code_list_sql <- lapply(code_list, \(x) glue::glue_sql("{x*}", .con = db_con))
-
-    results[[sheet]] <- code_list_sql
+    results[[sheet]] <- lapply(code_list, toupper)
 
     if (verbose) {
       cli::cli_alert_success("Lookup {.val {sheet}} created successfully.")
