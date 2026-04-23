@@ -26,6 +26,9 @@ Imports:
     kableExtra,
     magrittr,
     openxlsx2,
+    ggplot2,
+    highcharter,
+    rlang,
     scales,
     stringr
 Suggests:
