@@ -10,31 +10,55 @@ plot_hc_pie(
   value,
   title = NULL,
   subtitle = NULL,
-  palette = NULL,
+  colors = NULL,
   donut = FALSE,
-  labels = TRUE
+  show_labels = TRUE
 )
 }
 \arguments{
-\item{data}{A data frame.}
+\item{data}{A data frame containing at least two columns.}
 
-\item{category}{Column name (unquoted) for the slice categories.}
+\item{category}{A string specifying the column name for slice categories.}
 
-\item{value}{Column name (unquoted) for the numeric slice values.}
+\item{value}{A string specifying the column name for numeric slice values.
+Non-numeric values are coerced; NA rows are dropped silently.}
 
-\item{title}{Plot title. Default NULL.}
+\item{title}{A string for the plot title. Default NULL.}
 
-\item{subtitle}{Plot subtitle. Default NULL.}
+\item{subtitle}{A string for the plot subtitle. Default NULL.}
 
-\item{palette}{Character vector of colours. Default uses Highcharts defaults.}
+\item{colors}{A character vector of colours, one per category
+(e.g. `c("#C40000", "#FF7D29", "#1482FA")`). If NULL, Highcharts default
+colours are used.}
 
 \item{donut}{Logical. If TRUE, renders a donut chart. Default FALSE.}
 
-\item{labels}{Logical. If TRUE, shows data labels on slices. Default TRUE.}
+\item{show_labels}{Logical. If TRUE (default), displays data labels on
+slices showing category name and percentage.}
 }
 \value{
 A `highchart` object.
 }
 \description{
-Creates an interactive pie chart using the highcharter package.
+Creates an interactive pie or donut chart using the highcharter package.
+Data is prepared internally by renaming columns to the `name`/`y` structure
+that Highcharts expects natively.
+}
+\examples{
+\dontrun{
+df <- data.frame(
+  category = c("A", "B", "C"),
+  value    = c(10, 20, 30)
+)
+
+# Standard pie chart with default colours
+plot_hc_pie(df, category = "category", value = "value", title = "Example")
+
+# Custom colours
+plot_hc_pie(df, "category", "value",
+            colors = c("#C40000", "#FF7D29", "#1482FA"))
+
+# Donut chart
+plot_hc_pie(df, "category", "value", donut = TRUE, title = "Donut Example")
+}
 }

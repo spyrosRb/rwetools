@@ -16,6 +16,7 @@ Imports:
     arrow,
     checkmate,
     cli,
+    ComplexUpset,
     data.table,
     DBI,
     dplyr,
@@ -28,6 +29,7 @@ Imports:
     openxlsx2,
     ggplot2,
     highcharter,
+    patchwork,
     rlang,
     scales,
     stringr

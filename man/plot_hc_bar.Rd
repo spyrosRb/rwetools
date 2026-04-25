@@ -8,36 +8,44 @@ plot_hc_bar(
   data,
   x,
   y,
-  group = NULL,
-  stacking = NULL,
+  color = "#1482FA",
+  show_labels = FALSE,
+  label_text_size = 11,
   title = NULL,
   subtitle = NULL,
   x_label = NULL,
   y_label = NULL,
-  palette = NULL,
+  x_text_angle = 0,
+  y_axis_format = c("comma", "percent", "abbreviated"),
   flip = FALSE
 )
 }
 \arguments{
-\item{data}{A data frame.}
+\item{data}{A data frame containing the data to be plotted.}
 
-\item{x}{Column name (unquoted) for the categorical axis.}
+\item{x}{A string specifying the column name for the x-axis.}
 
-\item{y}{Column name (unquoted) for the numeric axis.}
+\item{y}{A string specifying the column name for the y-axis.}
 
-\item{group}{Column name (unquoted) for the grouping variable. Optional.}
+\item{color}{A string specifying the bar fill colour. Default `"#1482FA"`.}
 
-\item{stacking}{Stacking mode: `"normal"`, `"percent"`, or NULL (grouped). Default NULL.}
+\item{show_labels}{Logical. If TRUE, displays formatted data labels on bars.
+Default FALSE.}
 
-\item{title}{Plot title. Default NULL.}
+\item{label_text_size}{Size of data label text in pixels. Default `11`.}
 
-\item{subtitle}{Plot subtitle. Default NULL.}
+\item{title}{A string for the plot title. Default NULL.}
 
-\item{x_label}{X-axis label. Defaults to the column name.}
+\item{subtitle}{A string for the plot subtitle. Default NULL.}
 
-\item{y_label}{Y-axis label. Defaults to the column name.}
+\item{x_label}{A string for the x-axis label. Default NULL.}
 
-\item{palette}{Character vector of colours. Default uses Highcharts defaults.}
+\item{y_label}{A string for the y-axis label. Default NULL.}
+
+\item{x_text_angle}{Rotation angle for x-axis labels in degrees. Default `0`.}
+
+\item{y_axis_format}{Format for y-axis and data labels: `"comma"` (default),
+`"percent"`, or `"abbreviated"`.}
 
 \item{flip}{Logical. If TRUE, renders a horizontal bar chart. Default FALSE.}
 }
@@ -46,4 +54,24 @@ A `highchart` object.
 }
 \description{
 Creates an interactive bar plot using the highcharter package.
+}
+\examples{
+\dontrun{
+df <- data.frame(
+  country = c("Germany", "Belgium", "Austria", "Sweden", "Spain", "Italy"),
+  value   = c(500000, 450000, 150000, 200000, 350000, 250000)
+)
+
+# Abbreviated y-axis
+plot_hc_bar(df, x = "country", y = "value", y_axis_format = "abbreviated",
+            title = "GDP by Country", x_text_angle = 45)
+
+# With data labels
+plot_hc_bar(df, x = "country", y = "value", show_labels = TRUE,
+            y_axis_format = "comma")
+
+# Horizontal bars
+plot_hc_bar(df, x = "country", y = "value", flip = TRUE,
+            y_axis_format = "abbreviated")
+}
 }

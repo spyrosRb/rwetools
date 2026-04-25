@@ -1,55 +1,98 @@
 #' Interactive pie chart (Highcharts)
 #'
-#' Creates an interactive pie chart using the highcharter package.
+#' Creates an interactive pie or donut chart using the highcharter package.
+#' Data is prepared internally by renaming columns to the `name`/`y` structure
+#' that Highcharts expects natively.
 #'
-#' @param data A data frame.
-#' @param category Column name (unquoted) for the slice categories.
-#' @param value Column name (unquoted) for the numeric slice values.
-#' @param title Plot title. Default NULL.
-#' @param subtitle Plot subtitle. Default NULL.
-#' @param palette Character vector of colours. Default uses Highcharts defaults.
+#' @param data A data frame containing at least two columns.
+#' @param category A string specifying the column name for slice categories.
+#' @param value A string specifying the column name for numeric slice values.
+#'   Non-numeric values are coerced; NA rows are dropped silently.
+#' @param title A string for the plot title. Default NULL.
+#' @param subtitle A string for the plot subtitle. Default NULL.
+#' @param colors A character vector of colours, one per category
+#'   (e.g. `c("#C40000", "#FF7D29", "#1482FA")`). If NULL, Highcharts default
+#'   colours are used.
 #' @param donut Logical. If TRUE, renders a donut chart. Default FALSE.
-#' @param labels Logical. If TRUE, shows data labels on slices. Default TRUE.
+#' @param show_labels Logical. If TRUE (default), displays data labels on
+#'   slices showing category name and percentage.
 #'
 #' @return A `highchart` object.
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- data.frame(
+#'   category = c("A", "B", "C"),
+#'   value    = c(10, 20, 30)
+#' )
+#'
+#' # Standard pie chart with default colours
+#' plot_hc_pie(df, category = "category", value = "value", title = "Example")
+#'
+#' # Custom colours
+#' plot_hc_pie(df, "category", "value",
+#'             colors = c("#C40000", "#FF7D29", "#1482FA"))
+#'
+#' # Donut chart
+#' plot_hc_pie(df, "category", "value", donut = TRUE, title = "Donut Example")
+#' }
 plot_hc_pie <- function(data,
                         category,
                         value,
                         title = NULL,
                         subtitle = NULL,
-                        palette = NULL,
+                        colors = NULL,
                         donut = FALSE,
-                        labels = TRUE) {
+                        show_labels = TRUE) {
 
-  cat_var <- rlang::ensym(category)
-  val_var <- rlang::ensym(value)
+  checkmate::assert_data_frame(data, min.cols = 2)
+  checkmate::assert_string(category)
+  checkmate::assert_string(value)
+  checkmate::assert_string(title, null.ok = TRUE)
+  checkmate::assert_string(subtitle, null.ok = TRUE)
+  checkmate::assert_names(colnames(data), must.include = c(category, value))
+  checkmate::assert_logical(donut, len = 1)
+  checkmate::assert_logical(show_labels, len = 1)
 
-  series_data <- data %>%
-    dplyr::transmute(
-      name = as.character(!!cat_var),
-      y    = as.numeric(!!val_var)
-    ) %>%
-    highcharter::list_parse()
+  if (!is.null(colors)) {
+    checkmate::assert_character(colors, min.len = length(unique(data[[category]])))
+  }
+
+  cat_sym <- rlang::sym(category)
+  val_sym <- rlang::sym(value)
+
+  pie_data <- data %>%
+    dplyr::select(!!cat_sym, !!val_sym) %>%
+    dplyr::rename(name = !!cat_sym, y = !!val_sym) %>%
+    dplyr::mutate(y = as.numeric(y)) %>%
+    dplyr::filter(!is.na(.data$y))
+
+  if (!is.null(colors)) {
+    pie_data <- pie_data %>%
+      dplyr::mutate(color = rep(colors, length.out = dplyr::n()))
+  }
 
   inner_size <- if (donut) "50%" else "0%"
 
-  hc <- highcharter::highchart() %>%
+  highcharter::highchart() %>%
     highcharter::hc_chart(type = "pie") %>%
-    highcharter::hc_title(text = title) %>%
-    highcharter::hc_subtitle(text = subtitle) %>%
-    highcharter::hc_add_series(
-      name      = "Value",
-      data      = series_data,
-      innerSize = inner_size
+    highcharter::hc_title(text = title, align = "center") %>%
+    highcharter::hc_subtitle(text = subtitle, align = "center") %>%
+    highcharter::hc_series(list(
+      colorByPoint = is.null(colors),
+      innerSize    = inner_size,
+      data         = highcharter::list_parse(pie_data)
+    )) %>%
+    highcharter::hc_tooltip(
+      pointFormat = "<b>{point.name}</b>: {point.y} ({point.percentage:.1f}%)"
     ) %>%
     highcharter::hc_plotOptions(
       pie = list(
-        dataLabels = list(enabled = labels)
+        dataLabels = list(
+          enabled = show_labels,
+          format  = "{point.name} ({point.percentage:.1f}%)"
+        )
       )
     )
-
-  if (!is.null(palette)) hc <- hc %>% highcharter::hc_colors(palette)
-
-  hc
 }
