@@ -3,6 +3,8 @@
 export(assign_palette)
 export(calc_change_from_baseline)
 export(calc_incidence_rates)
+export(clean_environment)
+export(clean_scratch_space)
 export(generate_attrition_table)
 export(kill_redshift_sessions)
 export(load_medical_code_lists)
