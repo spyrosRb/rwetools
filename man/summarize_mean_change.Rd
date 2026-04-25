@@ -49,12 +49,21 @@ with fewer than 4 subjects trigger a warning.
 }
 \examples{
 \dontrun{
+set.seed(42)
+df <- data.frame(
+  patient_id    = rep(1:50, each = 3),
+  visit         = rep(c("Baseline", "Week 26", "Week 52"), times = 50),
+  weight_change = c(rep(0, 50), rnorm(50, mean = -2, sd = 1.5), rnorm(50, mean = -4, sd = 2)),
+  age           = rep(sample(40:70, 50, replace = TRUE), each = 3),
+  sex           = rep(sample(c("M", "F"), 50, replace = TRUE), each = 3)
+)
+
+# Raw means only
 summarize_mean_change(
   data         = df,
   patient_id   = "patient_id",
   visit        = "visit",
-  score_change = "weight_change",
-  conf_level   = 0.95
+  score_change = "weight_change"
 )
 
 # With adjusted means
