@@ -8,10 +8,6 @@
 #'   at minimum: visit, n, raw_mean, raw_ci_lower, raw_ci_upper. Adjusted
 #'   columns (adjusted_mean, adj_ci_lower, adj_ci_upper) are included
 #'   automatically when present.
-#' @param header_color Background colour for header cells. Default `"#1482FA"`.
-#' @param header_text_color Text colour for header cells. Default `"#FFFFFF"`.
-#' @param header_font_size Font size for header text in points. Default `14`.
-#' @param body_font_size Font size for body text in points. Default `12`.
 #' @param fixed_header Logical. If TRUE, the header remains fixed on scroll.
 #'   Default `TRUE`.
 #' @param bootstrap_options A character vector of Bootstrap styling options.
@@ -38,10 +34,6 @@
 #' }
 render_mean_change_table <- function(
     data,
-    header_color      = "#1482FA",
-    header_text_color = "#FFFFFF",
-    header_font_size  = 14,
-    body_font_size    = 12,
     fixed_header      = TRUE,
     bootstrap_options = c("striped", "hover", "condensed"),
     full_width        = TRUE,
@@ -50,10 +42,6 @@ render_mean_change_table <- function(
 
   #--- Argument checks ---
   checkmate::assert_data_frame(data)
-  checkmate::assert_string(header_color)
-  checkmate::assert_string(header_text_color)
-  checkmate::assert_number(header_font_size, lower = 1)
-  checkmate::assert_number(body_font_size, lower = 1)
   checkmate::assert_logical(fixed_header, len = 1)
   checkmate::assert_character(bootstrap_options, min.len = 1)
   checkmate::assert_logical(full_width, len = 1)
@@ -81,7 +69,6 @@ render_mean_change_table <- function(
       col.names = col_names
     ) |>
     kableExtra::kable_styling(
-      font_size         = body_font_size,
       fixed_thead       = fixed_header,
       bootstrap_options = bootstrap_options,
       full_width        = full_width,
@@ -89,16 +76,6 @@ render_mean_change_table <- function(
     ) |>
     kableExtra::add_header_above(
       header_spans,
-      escape     = FALSE,
-      background = header_color,
-      color      = header_text_color,
-      font_size  = header_font_size
-    ) |>
-    kableExtra::row_spec(
-      0,
-      bold       = TRUE,
-      font_size  = header_font_size,
-      background = header_color,
-      color      = header_text_color
+      escape     = FALSE
     )
 }

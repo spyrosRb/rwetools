@@ -108,7 +108,11 @@ plot_gg_bar <- function(data,
     ) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
-      legend.position = "none"
+      legend.position = "none",
+      axis.text.x = ggplot2::element_text(
+        angle = x_text_angle,
+        hjust = if (x_text_angle != 0) 1 else 0.5
+      )
     )
 
   p

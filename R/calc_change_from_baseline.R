@@ -15,9 +15,10 @@
 #'   supplied, columns are named `<prefix>_baseline` and `<prefix>_change`;
 #'   otherwise `baseline` and `change`. Default `""`.
 #'
-#' @return The input data frame with two additional columns: baseline value
-#'   and change from baseline. Rows where `visit` or `score` is `NA` receive
-#'   `NA` for both new columns.
+#' @return The input data frame with three additional columns: baseline value,
+#'   change from baseline, and percentage change from baseline. Rows where
+#'   `visit` or `score` is `NA` receive `NA` for all new columns. Percentage
+#'   change is `NA` when baseline is zero.
 #' @export
 #'
 #' @examples
@@ -42,8 +43,9 @@ calc_change_from_baseline <- function(data, patient_id, visit, score, prefix = "
   checkmate::assert_names(names(data), must.include = c(patient_id, visit, score))
 
   #--- Determine output column names based on prefix ---
-  baseline_var <- if (nzchar(prefix)) paste0(prefix, "_baseline") else "baseline"
-  change_var   <- if (nzchar(prefix)) paste0(prefix, "_change")   else "change"
+  baseline_var  <- if (nzchar(prefix)) paste0(prefix, "_baseline")    else "baseline"
+  change_var    <- if (nzchar(prefix)) paste0(prefix, "_change")      else "change"
+  pct_change_var <- if (nzchar(prefix)) paste0(prefix, "_pct_change") else "pct_change"
 
   #--- Derive baseline and change from baseline ---
   data |>
@@ -51,15 +53,15 @@ calc_change_from_baseline <- function(data, patient_id, visit, score, prefix = "
     dplyr::group_by(.data[[patient_id]]) |>
     dplyr::arrange(.data[[visit]], .by_group = TRUE) |>
     dplyr::mutate(
-      "{baseline_var}" := dplyr::first(.data[[score]]),
-      "{change_var}"   := .data[[score]] - .data[[baseline_var]]
+      "{baseline_var}"   := dplyr::first(.data[[score]]),
+      "{change_var}"     := .data[[score]] - .data[[baseline_var]],
+      "{pct_change_var}" := dplyr::if_else(
+        .data[[baseline_var]] == 0, NA_real_,
+        (.data[[score]] - .data[[baseline_var]]) / .data[[baseline_var]] * 100
+      )
     ) |>
     dplyr::ungroup() |>
     dplyr::select(
-      .data[[patient_id]],
-      .data[[visit]],
-      .data[[score]],
-      .data[[baseline_var]],
-      .data[[change_var]]
+      all_of(c(patient_id, visit, score, baseline_var, change_var, pct_change_var))
     )
 }

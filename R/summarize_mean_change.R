@@ -116,17 +116,27 @@ summarize_mean_change <- function(data,
 
   adjusted_means <- stats::lm(formula, data = data) |>
     emmeans::emmeans(specs = visit, level = conf_level) |>
-    broom::tidy() |>
-    dplyr::select(dplyr::all_of(c(visit, "estimate", "conf.low", "conf.high"))) |>
+    summary() |>
+    as.data.frame() |>
     dplyr::rename(
-      adjusted_mean = estimate,
-      adj_ci_lower  = conf.low,
-      adj_ci_upper  = conf.high
-    ) |>
+      adjusted_mean = emmean,
+      adj_ci_lower  = lower.CL,
+      adj_ci_upper  = upper.CL
+    ) %>% 
     dplyr::mutate(
-      dplyr::across(c(adjusted_mean, adj_ci_lower, adj_ci_upper), \(x) round(x, 2))
+      adjusted_mean = round(adjusted_mean, 2),
+      adj_ci_lower  = round(adj_ci_lower,2),
+      adj_ci_upper  = round(adj_ci_upper,2)
+    ) %>% 
+    dplyr::select(
+      dplyr::all_of(
+        c(visit, 
+          'adjusted_mean', 
+          'adj_ci_lower', 
+          'adj_ci_upper')
+      )
     )
-
+   
   #--- Merge raw and adjusted means ---
   raw_means |>
     dplyr::left_join(adjusted_means, by = visit) |>
